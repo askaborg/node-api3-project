@@ -47,7 +47,7 @@ router.get("/:id", validateUserId, (req, res) => {
   })
 })
 
-router.get("/:id/posts", (req, res, next) => {
+router.get("/:id/posts", validateUserId, (req, res, next) => {
   // do your magic!
   next()
 })
@@ -80,8 +80,12 @@ router.put("/:id", validateUserId, validateUser, (req, res) => {
   })
 })
 
-//custom middleware
+router.put("/:id/posts/:postId", validateUserId, validatePost, (req, res, next) => {
+  req.body.user_id = req.params.id
+  next()
+})
 
+//custom middleware
 function validateUserId(req, res, next) {
   // do your magic!
   const { id } = req.params
