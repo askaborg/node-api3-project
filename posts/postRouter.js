@@ -1,27 +1,13 @@
 const express = require("express")
 const Posts = require("./postDb.js")
 
-const router = express.Router()
+const router = express.Router({mergeParams: true})
 
 router.get("/", (req, res) => {
   // do your magic!
-  Posts.insert(req.body)
-  .then( resp => {
-    res.status(201).json(resp)
-  })
-  .catch( err => {
-    res.status(500).json({
-      errorMessage: "There was an error creating the post."
-    })
-  })
-})
-
-router.get("/:postId", (req, res) => {
-  // do your magic!
-  const { id } = req.params
+  const { id } = req.params;
   Posts.get()
   .then( resp => {
-    // console.log("resp", resp)
     const userPosts = resp.filter( post => {
       return Number(post.user_id) === Number(id)
     })
@@ -30,6 +16,32 @@ router.get("/:postId", (req, res) => {
   .catch( err => {
     res.status(500).json({
       errorMessage: "There was an error grabbing posts."
+    })
+  })
+})
+
+router.get("/:postId", validatePostId, (req, res) => {
+  // do your magic!
+  const { postId } = req.params;
+  Posts.getById(postId)
+  .then( resp => {
+    res.status(200).json(resp);
+  })
+  .catch( err => {
+    res.status(500).json({
+      errorMessage: "There was an error fetching post information."
+    })
+  })
+})
+
+router.post('/', (req, res) => {
+  Posts.insert(req.body)
+  .then( resp => {
+    res.status(201).json(resp)
+  })
+  .catch( err => {
+    res.status(500).json({
+      errorMessage: "There was an error creating the post."
     })
   })
 })
